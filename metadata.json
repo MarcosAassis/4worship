@@ -1,0 +1,6 @@
+{
+  "name": "4worship - Gestão de Ministérios de Louvor",
+  "description": "SaaS completo para gestão de escalas de louvor, repertório musical, controle de músicos e notificações interativas via Resend.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
