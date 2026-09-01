@@ -42,7 +42,7 @@ export function buildInviteShareText(org: Organization, appBaseUrl: string): str
   const link = `${appBaseUrl.replace(/\/$/, '')}/?codigo=${encodeURIComponent(normalizeInviteCode(org.inviteCode))}`;
   return [
     `Você foi convidado para o ${org.name}.`,
-    `${org.churchName}`,
+    ...(org.churchName?.trim() ? [org.churchName.trim()] : []),
     '',
     `Código de entrada: ${formatInviteCode(org.inviteCode)}`,
     '',

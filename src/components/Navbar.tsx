@@ -67,7 +67,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                   </span>
                 </div>
                 <p className="text-xs text-slate-500 font-medium truncate max-w-[160px] sm:max-w-xs">
-                  {activeOrg.churchName}
+                  {activeOrg.churchName?.trim() || activeOrg.name}
                 </p>
               </div>
             </div>
@@ -87,7 +87,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                 >
                   {organizations.map(org => (
                     <option key={org.id} value={org.id} className="bg-white text-slate-800">
-                      {org.name} ({org.churchName})
+                      {org.churchName ? `${org.name} (${org.churchName})` : org.name}
                     </option>
                   ))}
                 </select>
@@ -219,9 +219,11 @@ export const Navbar: React.FC<NavbarProps> = ({
                 >
                   <div>
                     <div className="font-bold">{org.name}</div>
+                    {org.churchName?.trim() ? (
                     <div className={activeOrg.id === org.id ? 'text-indigo-100 text-[11px]' : 'text-slate-500 text-[11px]'}>
                       {org.churchName}
                     </div>
+                    ) : null}
                   </div>
                   {activeOrg.id === org.id && <span className="font-bold">✓</span>}
                 </button>

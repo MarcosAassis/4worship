@@ -34,7 +34,7 @@ export class ResendEmailService {
     event: WorshipEvent;
     token: string;
     organizationName: string;
-    churchName: string;
+    churchName?: string;
     appBaseUrl: string;
   }): string {
     const { musicianName, instrument, event, token, organizationName, churchName, appBaseUrl } = params;
@@ -81,8 +81,9 @@ export class ResendEmailService {
           <!-- Header Banner -->
           <tr>
             <td style="background: linear-gradient(135deg, #1e1b4b 0%, #312e81 50%, #4338ca 100%); padding: 32px 24px; text-align: center; color: #ffffff;">
-              <div style="font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; color: #a5b4fc; margin-bottom: 6px;">${churchName}</div>
-              <h1 style="margin: 0; font-size: 24px; font-weight: 800; color: #ffffff; letter-spacing: -0.5px;">${organizationName}</h1>
+              <div style="font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; color: #a5b4fc; margin-bottom: 6px;">${organizationName}</div>
+              ${churchName ? `<div style="margin: 0 0 8px; font-size: 13px; color: #c7d2fe;">${churchName}</div>` : ''}
+              <h1 style="margin: 0; font-size: 24px; font-weight: 800; color: #ffffff; letter-spacing: -0.5px;">Convite de escala</h1>
               <div style="margin-top: 10px; display: inline-block; background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.25); border-radius: 20px; padding: 4px 16px; font-size: 13px; font-weight: 500;">
                 🎸 Notificação Oficial de Escala
               </div>

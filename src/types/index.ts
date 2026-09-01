@@ -49,7 +49,7 @@ export interface User {
 export interface Organization {
   id: string;
   name: string;
-  churchName: string;
+  churchName?: string;
   city: string;
   logoUrl?: string;
   leadersCount: number;

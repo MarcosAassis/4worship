@@ -10,6 +10,7 @@ import {
   ChevronRight,
   AlertTriangle,
   MapPin,
+  Pencil,
 } from 'lucide-react';
 import { WorshipEvent, Song, User, Organization, AppTab } from '../types';
 
@@ -22,6 +23,7 @@ interface DashboardOverviewProps {
   canManage: boolean;
   onOpenNewEvent: () => void;
   onOpenNewSong: () => void;
+  onOpenSettings?: () => void;
   onSelectEvent: (event: WorshipEvent) => void;
   onNavigateToTab: (tab: AppTab) => void;
 }
@@ -35,6 +37,7 @@ export const DashboardOverview: React.FC<DashboardOverviewProps> = ({
   canManage,
   onOpenNewEvent,
   onOpenNewSong,
+  onOpenSettings,
   onSelectEvent,
   onNavigateToTab,
 }) => {
@@ -92,9 +95,23 @@ export const DashboardOverview: React.FC<DashboardOverviewProps> = ({
               <p className="text-xs font-semibold uppercase tracking-[0.16em] text-amber-300/90">
                 {greeting}, {firstName}
               </p>
-              <h2 className="text-2xl font-extrabold tracking-tight sm:text-3xl">{activeOrg.name}</h2>
+              <div className="flex flex-wrap items-center gap-2">
+                <h2 className="text-2xl font-extrabold tracking-tight sm:text-3xl">{activeOrg.name}</h2>
+                {canManage && onOpenSettings && (
+                  <button
+                    type="button"
+                    onClick={onOpenSettings}
+                    className="inline-flex items-center gap-1 rounded-lg border border-white/15 bg-white/5 px-2 py-1 text-[11px] font-bold text-white/80 transition hover:bg-white/10"
+                  >
+                    <Pencil className="h-3 w-3" />
+                    Editar
+                  </button>
+                )}
+              </div>
               <p className="text-sm leading-relaxed text-white/60">
-                {activeOrg.churchName} · acompanhe escalas, repertório e confirmações da equipe em um só lugar.
+                {activeOrg.churchName?.trim()
+                  ? `${activeOrg.churchName} · acompanhe escalas, repertório e confirmações da equipe em um só lugar.`
+                  : 'Acompanhe escalas, repertório e confirmações da equipe em um só lugar.'}
               </p>
             </div>
           </div>

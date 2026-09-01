@@ -130,8 +130,8 @@ export const AuthOnboarding: React.FC<AuthOnboardingProps> = ({
   const submitCreate = (e: React.FormEvent) => {
     e.preventDefault();
     if (!currentUser) return;
-    if (!ministryName.trim() || !churchName.trim()) {
-      setCreateError('Informe o nome do ministério e da igreja.');
+    if (!ministryName.trim()) {
+      setCreateError('Informe o nome do ministério.');
       return;
     }
 
@@ -139,8 +139,8 @@ export const AuthOnboarding: React.FC<AuthOnboardingProps> = ({
     const org: Organization = {
       id: `org_${Date.now()}`,
       name: ministryName.trim(),
-      churchName: churchName.trim(),
-      city: city.trim() || 'Não informado',
+      churchName: churchName.trim() || undefined,
+      city: city.trim() || '',
       logoUrl,
       leadersCount: 1,
       musiciansCount: 1,
@@ -363,7 +363,7 @@ export const AuthOnboarding: React.FC<AuthOnboardingProps> = ({
                 />
               </div>
               <div>
-                <label className="mb-1 block text-xs font-bold text-white/70">Igreja / congregação</label>
+                <label className="mb-1 block text-xs font-bold text-white/70">Igreja / congregação (opcional)</label>
                 <input
                   value={churchName}
                   onChange={(e) => setChurchName(e.target.value)}

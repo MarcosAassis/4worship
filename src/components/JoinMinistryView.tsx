@@ -184,7 +184,9 @@ export const JoinMinistryView: React.FC<JoinMinistryViewProps> = ({
               <div>
                 <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-amber-300/90">Ministério encontrado</p>
                 <h1 className="mt-1 text-xl font-extrabold tracking-tight">{matchedOrg.name}</h1>
-                <p className="text-sm text-white/50">{matchedOrg.churchName}</p>
+                {matchedOrg.churchName?.trim() ? (
+                  <p className="text-sm text-white/50">{matchedOrg.churchName}</p>
+                ) : null}
               </div>
 
               <div className="space-y-3">

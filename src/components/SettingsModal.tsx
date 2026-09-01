@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { X, Mail, LogOut, Sun, Moon, ImagePlus, Trash2 } from 'lucide-react';
+import { X, Mail, LogOut, Sun, Moon, ImagePlus, Trash2, Check } from 'lucide-react';
 import { Organization } from '../types';
 import { InviteCodeCard } from './InviteCodeCard';
 import { MinistryLogo } from './MinistryLogo';
@@ -33,10 +33,39 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
   const [logoError, setLogoError] = useState<string | null>(null);
   const [logoBusy, setLogoBusy] = useState(false);
   const [mailHealth, setMailHealth] = useState<MusicSearchHealth | null>(null);
+  const [orgName, setOrgName] = useState(activeOrg.name);
+  const [churchName, setChurchName] = useState(activeOrg.churchName || '');
+  const [city, setCity] = useState(activeOrg.city === 'Não informado' ? '' : activeOrg.city || '');
+  const [orgError, setOrgError] = useState<string | null>(null);
+  const [orgSaved, setOrgSaved] = useState(false);
 
   useEffect(() => {
     fetchApiHealth().then(setMailHealth);
   }, []);
+
+  useEffect(() => {
+    setOrgName(activeOrg.name);
+    setChurchName(activeOrg.churchName || '');
+    setCity(activeOrg.city === 'Não informado' ? '' : activeOrg.city || '');
+  }, [activeOrg.id, activeOrg.name, activeOrg.churchName, activeOrg.city]);
+
+  const handleSaveOrg = (e: React.FormEvent) => {
+    e.preventDefault();
+    const name = orgName.trim();
+    if (!name) {
+      setOrgError('Informe o nome do ministério.');
+      return;
+    }
+    setOrgError(null);
+    onUpdateOrg({
+      ...activeOrg,
+      name,
+      churchName: churchName.trim() || undefined,
+      city: city.trim() || '',
+    });
+    setOrgSaved(true);
+    setTimeout(() => setOrgSaved(false), 1600);
+  };
 
   const handleLogoFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -115,14 +144,18 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
             <div>
               <p className="text-sm font-bold text-slate-900">Identidade do ministério</p>
               <p className="mt-0.5 text-xs text-slate-500">
-                A imagem aparece ao lado do nome do grupo na barra lateral e na tela inicial.
+                Nome, igreja (opcional) e imagem. Aparecem na barra lateral e na tela inicial.
               </p>
             </div>
             <div className="flex items-center gap-3 rounded-xl border border-slate-200 bg-slate-50 p-3">
               <MinistryLogo org={activeOrg} size="lg" />
               <div className="min-w-0 flex-1">
                 <p className="truncate text-sm font-bold text-slate-900">{activeOrg.name}</p>
-                <p className="truncate text-xs text-slate-500">{activeOrg.churchName}</p>
+                {activeOrg.churchName?.trim() ? (
+                  <p className="truncate text-xs text-slate-500">{activeOrg.churchName}</p>
+                ) : (
+                  <p className="truncate text-xs text-slate-400">Igreja não informada</p>
+                )}
                 {canManageInvite ? (
                   <div className="mt-2 flex flex-wrap items-center gap-1.5">
                     <label className={`inline-flex cursor-pointer items-center gap-1.5 rounded-lg bg-white px-2.5 py-1.5 text-[11px] font-bold text-slate-700 shadow-xs ring-1 ring-slate-200 hover:bg-slate-50 ${logoBusy ? 'opacity-60 pointer-events-none' : ''}`}>
@@ -148,11 +181,56 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({
                     )}
                   </div>
                 ) : (
-                  <p className="mt-1 text-[11px] text-slate-400">Somente o líder pode alterar a imagem.</p>
+                  <p className="mt-1 text-[11px] text-slate-400">Somente o líder pode alterar estes dados.</p>
                 )}
               </div>
             </div>
             {logoError && <p className="text-xs font-semibold text-rose-600">{logoError}</p>}
+
+            {canManageInvite && (
+              <form onSubmit={handleSaveOrg} className="space-y-3">
+                <div>
+                  <label className="mb-1 block text-xs font-bold text-slate-700">Nome do ministério *</label>
+                  <input
+                    value={orgName}
+                    onChange={(e) => setOrgName(e.target.value)}
+                    placeholder="Ex: Ministério de Louvor Shammah"
+                    className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs text-slate-900 placeholder-slate-400 focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
+                  />
+                </div>
+                <div>
+                  <label className="mb-1 block text-xs font-bold text-slate-700">Igreja / congregação (opcional)</label>
+                  <input
+                    value={churchName}
+                    onChange={(e) => setChurchName(e.target.value)}
+                    placeholder="Deixe em branco se não quiser exibir"
+                    className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs text-slate-900 placeholder-slate-400 focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
+                  />
+                </div>
+                <div>
+                  <label className="mb-1 block text-xs font-bold text-slate-700">Cidade (opcional)</label>
+                  <input
+                    value={city}
+                    onChange={(e) => setCity(e.target.value)}
+                    placeholder="Ex: São Paulo, SP"
+                    className="w-full rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs text-slate-900 placeholder-slate-400 focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
+                  />
+                </div>
+                {orgError && <p className="text-xs font-semibold text-rose-600">{orgError}</p>}
+                {orgSaved && (
+                  <p className="flex items-center gap-1.5 text-xs font-bold text-emerald-700">
+                    <Check className="h-3.5 w-3.5" />
+                    Dados do ministério salvos.
+                  </p>
+                )}
+                <button
+                  type="submit"
+                  className="rounded-xl bg-indigo-600 px-4 py-2 text-xs font-bold text-white shadow-xs transition hover:bg-indigo-700"
+                >
+                  Salvar dados do ministério
+                </button>
+              </form>
+            )}
           </section>
 
           {canManageInvite && (

@@ -93,7 +93,7 @@ export const RsvpTokenPortal: React.FC<RsvpTokenPortalProps> = ({
             <Music className="h-5 w-5" />
           </div>
           <span className="text-xs uppercase tracking-wider text-indigo-600 font-extrabold">
-            {activeOrg.churchName}
+            {activeOrg.churchName?.trim() || activeOrg.name}
           </span>
           <h1 className="text-xl font-extrabold text-slate-900 mt-1 tracking-tight">
             Convite de Escala: {event.title}

@@ -412,6 +412,7 @@ export default function App() {
             canManage={canManage}
             onOpenNewEvent={() => setIsNewEventOpen(true)}
             onOpenNewSong={() => setIsNewSongOpen(true)}
+            onOpenSettings={() => setIsSettingsOpen(true)}
             onSelectEvent={(evt) => setSelectedDetailEvent(evt)}
             onNavigateToTab={setCurrentTab}
           />

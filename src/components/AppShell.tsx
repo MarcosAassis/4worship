@@ -180,9 +180,11 @@ export const AppShell: React.FC<AppShellProps> = ({
           </div>
           <div className="min-w-0">
             <p className="font-extrabold tracking-tight text-[15px] leading-none">4worship</p>
-            <p className={`mt-1 truncate text-[11px] ${isDark ? 'text-white/45' : 'text-slate-400'}`}>
-              {activeOrg.churchName}
-            </p>
+            {activeOrg.churchName?.trim() ? (
+              <p className={`mt-1 truncate text-[11px] ${isDark ? 'text-white/45' : 'text-slate-400'}`}>
+                {activeOrg.churchName}
+              </p>
+            ) : null}
           </div>
         </div>
 
@@ -201,9 +203,11 @@ export const AppShell: React.FC<AppShellProps> = ({
               <p className={`truncate text-xs font-medium ${isDark ? 'text-white/80' : 'text-slate-800'}`}>
                 {activeOrg.name}
               </p>
-              <p className={`truncate text-[10px] ${isDark ? 'text-white/40' : 'text-slate-400'}`}>
-                {activeOrg.churchName}
-              </p>
+              {activeOrg.churchName?.trim() ? (
+                <p className={`truncate text-[10px] ${isDark ? 'text-white/40' : 'text-slate-400'}`}>
+                  {activeOrg.churchName}
+                </p>
+              ) : null}
             </div>
           </div>
 
@@ -287,7 +291,9 @@ export const AppShell: React.FC<AppShellProps> = ({
             <MinistryLogo org={activeOrg} size="sm" className="rounded-xl" />
             <div className="text-left">
               <p className="max-w-[180px] truncate text-sm font-extrabold leading-none">{activeOrg.name}</p>
-              <p className="mt-0.5 max-w-[180px] truncate text-[10px] text-slate-500">{activeOrg.churchName}</p>
+              {activeOrg.churchName?.trim() ? (
+                <p className="mt-0.5 max-w-[180px] truncate text-[10px] text-slate-500">{activeOrg.churchName}</p>
+              ) : null}
             </div>
           </button>
           <div className="flex items-center gap-1.5">
