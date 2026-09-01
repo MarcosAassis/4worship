@@ -409,12 +409,14 @@ export default function App() {
             musicians={orgUsers}
             activeOrg={activeOrg}
             currentUserName={currentUser.name}
+            currentUser={currentUser}
             canManage={canManage}
             onOpenNewEvent={() => setIsNewEventOpen(true)}
             onOpenNewSong={() => setIsNewSongOpen(true)}
             onOpenSettings={() => setIsSettingsOpen(true)}
             onSelectEvent={(evt) => setSelectedDetailEvent(evt)}
             onNavigateToTab={setCurrentTab}
+            onUpdateMusician={handleUpdateMusician}
           />
         )}
 
@@ -445,6 +447,7 @@ export default function App() {
             events={orgEvents}
             activeOrg={activeOrg}
             canManage={canManage}
+            currentUserId={currentUser.id}
             onOpenNewMusician={() => setIsNewMusicianOpen(true)}
             onDeleteMusician={handleDeleteMusician}
             onUpdateMusician={handleUpdateMusician}

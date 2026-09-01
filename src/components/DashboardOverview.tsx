@@ -11,8 +11,10 @@ import {
   AlertTriangle,
   MapPin,
   Pencil,
+  CalendarOff,
 } from 'lucide-react';
 import { WorshipEvent, Song, User, Organization, AppTab } from '../types';
+import { UnavailabilityEditor } from './UnavailabilityEditor';
 
 interface DashboardOverviewProps {
   events: WorshipEvent[];
@@ -20,12 +22,14 @@ interface DashboardOverviewProps {
   musicians: User[];
   activeOrg: Organization;
   currentUserName: string;
+  currentUser: User;
   canManage: boolean;
   onOpenNewEvent: () => void;
   onOpenNewSong: () => void;
   onOpenSettings?: () => void;
   onSelectEvent: (event: WorshipEvent) => void;
   onNavigateToTab: (tab: AppTab) => void;
+  onUpdateMusician: (user: User) => void;
 }
 
 export const DashboardOverview: React.FC<DashboardOverviewProps> = ({
@@ -34,12 +38,14 @@ export const DashboardOverview: React.FC<DashboardOverviewProps> = ({
   musicians,
   activeOrg,
   currentUserName,
+  currentUser,
   canManage,
   onOpenNewEvent,
   onOpenNewSong,
   onOpenSettings,
   onSelectEvent,
   onNavigateToTab,
+  onUpdateMusician,
 }) => {
   let totalPositions = 0;
   let confirmedPositions = 0;
@@ -198,6 +204,28 @@ export const DashboardOverview: React.FC<DashboardOverviewProps> = ({
           <p className="mt-0.5 text-xs text-slate-500">voluntários ativos</p>
         </button>
       </div>
+
+      <section className="rounded-2xl border border-amber-200/80 bg-white p-5 shadow-xs">
+        <div className="mb-3 flex items-start justify-between gap-3">
+          <div>
+            <h3 className="flex items-center gap-1.5 text-sm font-bold text-slate-900">
+              <CalendarOff className="h-4 w-4 text-amber-600" />
+              Minha indisponibilidade
+            </h3>
+            <p className="mt-0.5 text-xs text-slate-500">
+              Bloqueie datas em que você não pode servir. A escala avisa o líder na hora de montar a equipe.
+            </p>
+          </div>
+          <button
+            type="button"
+            onClick={() => onNavigateToTab('musicians')}
+            className="inline-flex shrink-0 items-center text-xs font-semibold text-indigo-600 hover:text-indigo-800"
+          >
+            Ver equipe <ChevronRight className="h-3.5 w-3.5" />
+          </button>
+        </div>
+        <UnavailabilityEditor user={currentUser} onUpdate={onUpdateMusician} compact />
+      </section>
 
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-5">
         <section className="lg:col-span-3 rounded-2xl border border-slate-200/80 bg-white p-5 shadow-xs">

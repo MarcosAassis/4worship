@@ -1,28 +1,24 @@
 import React, { useState } from 'react';
-import { 
-  Users, 
-  Search, 
-  Plus, 
-  Phone, 
-  Mail, 
-  Calendar, 
-  Check, 
-  X, 
+import {
+  Search,
+  Plus,
+  Phone,
+  Mail,
+  Check,
+  X,
   ExternalLink,
-  Shield,
   Trash2,
-  Edit2,
-  Sparkles,
-  MessageSquare
 } from 'lucide-react';
 import { User, InstrumentType, WorshipEvent, DayOfWeek, Organization } from '../types';
 import { InviteCodeCard } from './InviteCodeCard';
+import { UnavailabilityEditor } from './UnavailabilityEditor';
 
 interface MusiciansViewProps {
   musicians: User[];
   events: WorshipEvent[];
   activeOrg: Organization;
   canManage: boolean;
+  currentUserId: string;
   onOpenNewMusician: () => void;
   onDeleteMusician: (id: string) => void;
   onUpdateMusician: (user: User) => void;
@@ -49,6 +45,7 @@ export const MusiciansView: React.FC<MusiciansViewProps> = ({
   events,
   activeOrg,
   canManage,
+  currentUserId,
   onOpenNewMusician,
   onDeleteMusician,
   onUpdateMusician,
@@ -156,6 +153,7 @@ export const MusiciansView: React.FC<MusiciansViewProps> = ({
         {filteredMusicians.map(musician => {
           const scalesCount = getMusicianScaleCount(musician.id);
           const cleanPhone = musician.phone ? musician.phone.replace(/\D/g, '') : null;
+          const canEditAvailability = canManage || musician.id === currentUserId;
 
           return (
             <div
@@ -277,34 +275,77 @@ export const MusiciansView: React.FC<MusiciansViewProps> = ({
                 {/* Weekly Availability Matrix */}
                 <div className="mt-3.5 pt-3 border-t border-slate-100">
                   <span className="text-xs font-bold text-slate-500 block mb-2">
-                    Disponibilidade Semanal:
+                    Disponibilidade semanal
+                    {canEditAvailability ? (
+                      <span className="ml-1 font-medium text-slate-400">(toque para alterar)</span>
+                    ) : null}
                   </span>
                   <div className="grid grid-cols-2 gap-1.5 text-xs">
-                    {musician.weeklyAvailability.map(avail => (
-                      <div
-                        key={avail.day}
-                        className={`p-1.5 rounded-lg flex items-center justify-between border ${
-                          avail.available
-                            ? 'bg-emerald-50/80 border-emerald-200 text-emerald-900 font-medium'
-                            : 'bg-rose-50/80 border-rose-200 text-rose-900 font-medium'
-                        }`}
-                        title={avail.notes || (avail.available ? 'Disponível' : 'Indisponível')}
-                      >
-                        <span>{formatDayLabel(avail.day)}</span>
-                        {avail.available ? (
-                          <Check className="w-3.5 h-3.5 text-emerald-600" />
-                        ) : (
-                          <X className="w-3.5 h-3.5 text-rose-600" />
-                        )}
-                      </div>
-                    ))}
+                    {musician.weeklyAvailability.map(avail => {
+                      const cellClass = `p-1.5 rounded-lg flex items-center justify-between border ${
+                        avail.available
+                          ? 'bg-emerald-50/80 border-emerald-200 text-emerald-900 font-medium'
+                          : 'bg-rose-50/80 border-rose-200 text-rose-900 font-medium'
+                      }`;
+                      const content = (
+                        <>
+                          <span>{formatDayLabel(avail.day)}</span>
+                          {avail.available ? (
+                            <Check className="w-3.5 h-3.5 text-emerald-600" />
+                          ) : (
+                            <X className="w-3.5 h-3.5 text-rose-600" />
+                          )}
+                        </>
+                      );
+                      if (!canEditAvailability) {
+                        return (
+                          <div
+                            key={avail.day}
+                            className={cellClass}
+                            title={avail.notes || (avail.available ? 'Disponível' : 'Indisponível')}
+                          >
+                            {content}
+                          </div>
+                        );
+                      }
+                      return (
+                        <button
+                          key={avail.day}
+                          type="button"
+                          onClick={() => {
+                            onUpdateMusician({
+                              ...musician,
+                              weeklyAvailability: musician.weeklyAvailability.map((slot) =>
+                                slot.day === avail.day
+                                  ? { ...slot, available: !slot.available }
+                                  : slot
+                              ),
+                            });
+                          }}
+                          className={`${cellClass} w-full text-left transition hover:opacity-90`}
+                          title={avail.available ? 'Marcar como indisponível' : 'Marcar como disponível'}
+                        >
+                          {content}
+                        </button>
+                      );
+                    })}
                   </div>
 
-                  {musician.blockedDates && musician.blockedDates.length > 0 && (
+                  {canEditAvailability ? (
+                    <UnavailabilityEditor user={musician} onUpdate={onUpdateMusician} />
+                  ) : musician.blockedDates && musician.blockedDates.length > 0 ? (
                     <div className="mt-2 text-xs text-amber-900 bg-amber-50 border border-amber-200 p-2 rounded-lg">
-                      🚫 <strong>Datas bloqueadas:</strong> {musician.blockedDates.join(', ')}
+                      Datas bloqueadas:{' '}
+                      {musician.blockedDates
+                        .slice()
+                        .sort()
+                        .map((iso) => {
+                          const [y, m, d] = iso.split('-');
+                          return `${d}/${m}/${y}`;
+                        })
+                        .join(', ')}
                     </div>
-                  )}
+                  ) : null}
                 </div>
 
               </div>
