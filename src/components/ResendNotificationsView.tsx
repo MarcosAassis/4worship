@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   Send,
   Mail,
@@ -8,6 +8,8 @@ import {
 } from 'lucide-react';
 import { EmailNotificationLog, WorshipEvent, Organization } from '../types';
 import { ResendEmailService } from '../services/resendService';
+import { fetchApiHealth } from '../services/musicSearchApi';
+import { MusicSearchHealth } from '../types/musicSearch';
 
 interface ResendNotificationsViewProps {
   logs: EmailNotificationLog[];
@@ -28,8 +30,13 @@ export const ResendNotificationsView: React.FC<ResendNotificationsViewProps> = (
   const [selectedEventId, setSelectedEventId] = useState(events[0]?.id || '');
   const [isSending, setIsSending] = useState(false);
   const [feedback, setFeedback] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
+  const [mailHealth, setMailHealth] = useState<MusicSearchHealth | null>(null);
 
-  const credentials = ResendEmailService.getCredentials();
+  useEffect(() => {
+    fetchApiHealth().then(setMailHealth);
+  }, []);
+
+  const mailConfigured = Boolean(mailHealth?.resend);
 
   const handleSendTestScale = async () => {
     if (!testEmail) {
@@ -90,7 +97,7 @@ export const ResendNotificationsView: React.FC<ResendNotificationsViewProps> = (
           className="flex items-center space-x-2 bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 px-4 py-2 rounded-xl text-xs font-bold shadow-xs transition self-start sm:self-auto sm:ml-auto"
         >
           <Settings className="w-4 h-4 text-slate-500" />
-          <span>{credentials.isConfigured ? 'E-mail configurado' : 'Configurar e-mail'}</span>
+          <span>{mailConfigured ? 'E-mail configurado' : 'E-mail no servidor'}</span>
         </button>
       </div>
 
@@ -103,12 +110,12 @@ export const ResendNotificationsView: React.FC<ResendNotificationsViewProps> = (
             </h3>
             <span
               className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${
-                credentials.isConfigured
+                mailConfigured
                   ? 'bg-emerald-50 text-emerald-700'
                   : 'bg-amber-50 text-amber-800'
               }`}
             >
-              {credentials.isConfigured ? 'Ativo' : 'Modo teste'}
+              {mailConfigured ? 'Ativo' : 'Modo teste'}
             </span>
           </div>
           <p className="text-xs leading-relaxed text-slate-500">
@@ -116,7 +123,7 @@ export const ResendNotificationsView: React.FC<ResendNotificationsViewProps> = (
           </p>
           <div className="rounded-xl bg-slate-50 border border-slate-100 px-3 py-2.5 text-xs">
             <p className="text-[10px] font-semibold uppercase tracking-wider text-slate-400">Remetente</p>
-            <p className="mt-0.5 font-semibold text-slate-800">{credentials.fromEmail}</p>
+            <p className="mt-0.5 font-semibold text-slate-800">{mailHealth?.fromEmail || 'onboarding@resend.dev'}</p>
           </div>
         </div>
 

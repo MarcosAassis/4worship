@@ -44,6 +44,9 @@ export interface MusicSearchErrorBody {
 }
 
 export interface MusicSearchHealth {
+  ok?: boolean;
   spotify: boolean;
   youtube: boolean;
+  resend?: boolean;
+  fromEmail?: string;
 }

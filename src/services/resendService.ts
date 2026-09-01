@@ -1,4 +1,5 @@
 import { WorshipEvent, ScheduleMember, EmailNotificationLog } from '../types';
+import { apiUrl } from './apiBase';
 
 export interface ResendSendResult {
   success: boolean;
@@ -283,61 +284,40 @@ export class ResendEmailService {
   }
 
   /**
-   * Dispatches an email via Resend API (real or simulation)
+   * Sends email through the backend (Resend key stays on the server).
    */
   public static async sendEmail(params: {
     to: string;
     subject: string;
     html: string;
   }): Promise<ResendSendResult> {
-    const { to, subject, html } = params;
-
-    // If a valid Resend key is provided in settings, attempt real API call
-    if (this.apiKey && this.apiKey.startsWith('re_')) {
-      try {
-        const response = await fetch('https://api.resend.com/emails', {
-          method: 'POST',
-          headers: {
-            'Authorization': `Bearer ${this.apiKey}`,
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            from: this.fromEmail || 'onboarding@resend.dev',
-            to: [to],
-            subject: subject,
-            html: html,
-          }),
-        });
-
-        const data = await response.json();
-        if (response.ok && data.id) {
-          return {
-            success: true,
-            messageId: data.id,
-            isSimulated: false,
-          };
-        } else {
-          return {
-            success: false,
-            error: data.message || 'Falha na resposta do Resend',
-            isSimulated: false,
-          };
-        }
-      } catch (err: any) {
+    try {
+      const response = await fetch(apiUrl('/api/email/send'), {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(params),
+      });
+      const data = (await response.json().catch(() => ({}))) as ResendSendResult & { message?: string };
+      if (!response.ok) {
         return {
           success: false,
-          error: err?.message || 'Erro de rede ao conectar com api.resend.com',
+          error: data.error || data.message || 'Falha ao enviar e-mail.',
           isSimulated: false,
         };
       }
+      return {
+        success: Boolean(data.success),
+        messageId: data.messageId,
+        error: data.error,
+        isSimulated: data.isSimulated,
+      };
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : 'Erro de rede ao enviar e-mail.';
+      return {
+        success: false,
+        error: message,
+        isSimulated: false,
+      };
     }
-
-    // High fidelity simulator mode for dev preview
-    const fakeId = `resend_msg_${Math.random().toString(36).substring(2, 11)}`;
-    return {
-      success: true,
-      messageId: fakeId,
-      isSimulated: true,
-    };
   }
 }
